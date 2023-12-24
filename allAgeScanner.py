@@ -40,7 +40,6 @@ class DoctorInfo:
   def __init__(self, text):
         #initialize
         self.age = None 
-        self.profession = None
         self.yearOfDeath = None
         self.isError = False
 
@@ -248,10 +247,6 @@ class DoctorInfo:
           if(field.startswith("died")):
               diedText = field.split()
               continue
-          
-          #get profession
-          if(self.populateProfession(field)):
-              continue
 
          
               
@@ -314,21 +309,11 @@ def main():
     numYears = 1
     for obituary in doctorInfoArray:
         currYearKey = str(obituary.yearOfDeath)
-        [currProfessionKey] = obituary.profession
         if(currYearKey not in infoDict):
             numYears +=1
             infoDict[currYearKey] = dict()
             infoDict[currYearKey][totalDeathKey] = []
-
-        if(currProfessionKey not in infoDict[currYearKey]):
-            infoDict[currYearKey][currProfessionKey] = []
             
-        if(currProfessionKey not in infoDict[allYearsKey]):
-            infoDict[allYearsKey][currProfessionKey] = []
-            numProfessions+=1
-            
-        infoDict[allYearsKey][currProfessionKey].append(obituary.age)
-        infoDict[currYearKey][currProfessionKey].append(obituary.age)
         infoDict[allYearsKey][totalDeathKey].append(obituary.age)
         infoDict[currYearKey][totalDeathKey].append(obituary.age)
         
