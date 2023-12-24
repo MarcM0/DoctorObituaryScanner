@@ -302,7 +302,7 @@ def main():
     #count statistics
     infoDict = dict()
     allYearsKey="allYears"
-    totalDeathKey = "totalDeaths"
+    totalDeathKey = "allProfessions"
     infoDict[allYearsKey] = dict()
     infoDict[allYearsKey][totalDeathKey] = []
     numProfessions = 1
