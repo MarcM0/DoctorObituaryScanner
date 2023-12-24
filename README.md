@@ -1,6 +1,6 @@
 # Doctor Obituary Scanner
 Script to obituaries of doctors in different specialties in the PMC https://www.ncbi.nlm.nih.gov/pmc database. The search query was ```(("deaths"[Title] OR obituaries[Title])) AND ("CMAJ"[Journal])```. 
-Input data not provided due to copyright
+Input data not provided due to copyright.
 If you wish to rerun the program, follow the instructions below.
 
 To run:
