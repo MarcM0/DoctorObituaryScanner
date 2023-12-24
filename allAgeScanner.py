@@ -25,17 +25,6 @@ def getFields(text):
 
     return text
 
-#create regex
-professionsSet = ['acoustics', 'addiction medicine', 'allergist', 'allergy and clinical immunology', 'anesthesia', 'anesthesiologist', 'anesthesiology', 'anesthetist', 'audiology', 'bacteriology', 'biologics', 'biophysics', 'biostatistics', 'cardiac surgeon', 'cardiac surgery', 'cardiologist', 'cardiology', 'chronic pain', 'critical care', 'cytogenetics', 'dermatologist', 'dermatology', 'electroencephalography', 'emergency medicine', 'endocrinologist', 'endocrinology', 'ent', 'epidemiology', 'family medicine', 'family practice', 'gastroenterologist', 'gastroenterology', 'general practice', 'general surgeon', 'general surgery', 'general thoracic surgery', 'geneticist', 'genetics', 'geriatric medicine', 'geriatrician', 'geriatrics', 'gynecologist', 'gynecology', 'haematologist', 'head and neck surgeon', 'head and neck surgery', 'hematologist', 'hematology', 'hospital medicine', 'hospitalist', 'immunologist', 'immunology', 'infectious disease', 'internal medicine', 'internist', 'laboratory medicine', 'long-term care', 'medical biochemistry', 'microbiology', 'neonatology', 'nephrologist', 'nephrology', 'neuro-radiology', 'neurologist', 'neurology', 'neuropathology', 'neuroradiologist', 'neuroradiology', 'neurosurgeon', 'neurosurgery', 'nuclear medicine', 'nuclear medicine radiologist', 'obgyn', 'obstetrician', 'obstetrics', 'occupational and environmental medicine', 'oncologist', 'oncology', 'ophthalmologist', 'ophthalmology', 'opthalmology', 'orthopedic surgeon', 'orthopedic surgery', 'orthopedics', 'oto-rhino-laryngology', 'otolaryngologist', 'otolaryngology', 'otoloryngology', 'otorhinolaryngology', 'palliative medicine', 'pathobiology', 'pathologist', 'pathology', 'pediatric', 'pediatrician', 'pediatrics', 'pharmacology', 'physiatry', 'physical medicine and rehabilitation', 'physiology', 'plastic surgeon', 'plastic surgery', 'pneumology', 'primary care mental health', 'psychiatrist', 'psychiatry', 'psychology', 'public health', 'radiologist', 'radiology', 'respiratory disease', 'respirologist', 'respirology', 'rheumatologist', 'rheumatology', 'rural medicine', 'sport and exercise medicine', 'surgery', 'syphilology', 'thoracic surgeon', 'toxicology', 'urologist', 'urology', 'vascular surgeon', 'vascular surgery', 'virology']
-professionsSet = set([a.lower().strip() for a in professionsSet])
-searchString = ""
-for item in professionsSet:
-    if searchString!="":
-        searchString+=r"|"
-    #\b is used to make sure its not part of another word
-    searchString+= r"(\b" + re.escape(item) + r"\b)"
-professionsRegex = re.compile(searchString)
-
 class DoctorInfo:
   def __init__(self, text):
         #initialize
