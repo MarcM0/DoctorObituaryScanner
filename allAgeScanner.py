@@ -87,7 +87,7 @@ class DoctorInfo:
         year = diedText[-3]
         assert(year.isnumeric())
         year = int(year)
-        assert(2000<=year<=2023)
+        assert(1999<=year<=2023)
 
         #age 
         age = diedText[-1]
