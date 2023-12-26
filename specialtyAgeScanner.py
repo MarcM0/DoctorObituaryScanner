@@ -9,7 +9,7 @@ import shutil
 import traceback
 
 # professionsMissed = []
-commonCombos = dict()
+# commonCombos = dict()
 
 #Separate out fields
 def getFields(text):
@@ -219,11 +219,11 @@ class DoctorInfo:
         return False 
       
       #keep track of common combos
-      key = str(professionsList)
-      if key in commonCombos:
-        commonCombos[key] += 1
-      else:
-        commonCombos[key] = 1
+    #   key = str(professionsList)
+    #   if key in commonCombos:
+    #     commonCombos[key] += 1
+    #   else:
+    #     commonCombos[key] = 1
       raise Exception("Invalid interestion size"+str(professionsList))
           
       
@@ -304,7 +304,7 @@ def main():
     print("Errors", len(errorsArray))
     print("Valid", len(doctorInfoArray))
     # print("Possible professions missed in professionsSet", set(professionsMissed))
-    print("Possible missed combos", json.dumps({k: v for k, v in sorted(commonCombos.items(), key=lambda item: item[1])},indent=4))
+    # print("Possible missed combos", json.dumps({k: v for k, v in sorted(commonCombos.items(), key=lambda item: item[1])},indent=4))
 
     #count statistics
     infoDict = dict()
