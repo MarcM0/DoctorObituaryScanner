@@ -233,7 +233,7 @@ def main():
 
         
     #save the excel sheet with name of status
-    with open(os.path.join(outputDir,'output.csv'), 'w', newline='', encoding="utf-8-sig") as fp:
+    with open(os.path.join(outputDir,'noProfession.csv'), 'w', newline='', encoding="utf-8-sig") as fp:
             writer = csv.writer(fp, quoting=csv.QUOTE_NONNUMERIC)
             writer.writerows(output.tolist())
     
