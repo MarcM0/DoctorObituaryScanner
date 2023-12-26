@@ -108,7 +108,6 @@ class DoctorInfo:
         'bacteriology': 'pathology', 
         'pediatrics': 'pediatric',
         'pediatrician': 'pediatric',
-        'otolaryngology': 'otolaryngology',
         'otorhinolaryngology': 'otolaryngology',
         'otoloryngology': 'otolaryngology',
         'oto-rhino-laryngology': 'otolaryngology',
@@ -116,6 +115,7 @@ class DoctorInfo:
         'audiologist': 'otolaryngology', 
         'internist': 'internal medicine',  
         'pneumology': 'respirology',
+        'physiatry': 'physical medicine and rehabilitation',
     }
   
 
