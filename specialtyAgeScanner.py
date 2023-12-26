@@ -5,11 +5,11 @@ import pandas as pd
 import numpy as np
 import json
 import time
-import datetime
+import shutil
 import traceback
 
 # professionsMissed = []
-# commonCombos = dict()
+commonCombos = dict()
 
 #Separate out fields
 def getFields(text):
@@ -26,7 +26,7 @@ def getFields(text):
     return text
 
 #create regex
-professionsSet = ['acoustics', 'addiction medicine', 'allergist', 'allergy and clinical immunology', 'anesthesia', 'anesthesiologist', 'anesthesiology', 'anesthetist', 'audiology', 'bacteriology', 'biologics', 'biophysics', 'biostatistics', 'cardiac surgeon', 'cardiac surgery', 'cardiologist', 'cardiology', 'chronic pain', 'critical care', 'cytogenetics', 'dermatologist', 'dermatology', 'electroencephalography', 'emergency medicine', 'endocrinologist', 'endocrinology', 'ent', 'epidemiology', 'family medicine', 'family practice', 'gastroenterologist', 'gastroenterology', 'general practice', 'general surgeon', 'general surgery', 'general thoracic surgery', 'geneticist', 'genetics', 'geriatric medicine', 'geriatrician', 'geriatrics', 'gynecologist', 'gynecology', 'haematologist', 'head and neck surgeon', 'head and neck surgery', 'hematologist', 'hematology', 'hospital medicine', 'hospitalist', 'immunologist', 'immunology', 'infectious disease', 'internal medicine', 'internist', 'laboratory medicine', 'long-term care', 'medical biochemistry', 'microbiology', 'neonatology', 'nephrologist', 'nephrology', 'neuro-radiology', 'neurologist', 'neurology', 'neuropathology', 'neuroradiologist', 'neuroradiology', 'neurosurgeon', 'neurosurgery', 'nuclear medicine', 'nuclear medicine radiologist', 'obgyn', 'obstetrician', 'obstetrics', 'occupational and environmental medicine', 'oncologist', 'oncology', 'ophthalmologist', 'ophthalmology', 'opthalmology', 'orthopedic surgeon', 'orthopedic surgery', 'orthopedics', 'oto-rhino-laryngology', 'otolaryngologist', 'otolaryngology', 'otoloryngology', 'otorhinolaryngology', 'palliative medicine', 'pathobiology', 'pathologist', 'pathology', 'pediatric', 'pediatrician', 'pediatrics', 'pharmacology', 'physiatry', 'physical medicine and rehabilitation', 'physiology', 'plastic surgeon', 'plastic surgery', 'pneumology', 'primary care mental health', 'psychiatrist', 'psychiatry', 'psychology', 'public health', 'radiologist', 'radiology', 'respiratory disease', 'respirologist', 'respirology', 'rheumatologist', 'rheumatology', 'rural medicine', 'sport and exercise medicine', 'surgery', 'syphilology', 'thoracic surgeon', 'toxicology', 'urologist', 'urology', 'vascular surgeon', 'vascular surgery', 'virology']
+professionsSet = ['acoustics', 'acoustics surgery', 'addiction medicine', 'addiction medicine surgery', 'allergist', 'allergist surgery', 'allergy and clinical immunology', 'allergy and clinical immunology surgery', 'anesthesia', 'anesthesia surgery', 'anesthesiology', 'anesthesiology surgery', 'anesthetist', 'anesthetist surgery', 'audiology', 'audiology surgery', 'bacteriology', 'bacteriology surgery', 'biologics', 'biologics surgery', 'biophysics', 'biophysics surgery', 'biostatistics', 'biostatistics surgery', 'cardiac surgery', 'cardiology', 'cardiology surgery', 'chronic pain', 'chronic pain surgery', 'critical care', 'critical care surgery', 'cytogenetics', 'cytogenetics surgery', 'dermatology', 'dermatology surgery', 'electroencephalography', 'electroencephalography surgery', 'emergency medicine', 'emergency medicine surgery', 'endocrinology', 'endocrinology surgery', 'ent', 'ent surgery', 'epidemiology', 'epidemiology surgery', 'family medicine', 'family medicine surgery', 'family practice', 'family practice surgery', 'gastroenterology', 'gastroenterology surgery', 'general practice', 'general practice surgery', 'geneticist', 'geneticist surgery', 'genetics', 'genetics surgery', 'geriatric medicine', 'geriatric medicine surgery', 'geriatrician', 'geriatrician surgery', 'geriatrics', 'geriatrics surgery', 'gynaecology', 'gynaecology surgery', 'gynecology', 'gynecology surgery', 'haematology', 'haematology surgery', 'head and neck surgery', 'hematology', 'hematology surgery', 'hospital medicine', 'hospital medicine surgery', 'hospitalist', 'hospitalist surgery', 'immunology', 'immunology surgery', 'infectious disease', 'infectious disease surgery', 'internal medicine', 'internal medicine surgery', 'internist', 'internist surgery', 'laboratory medicine', 'laboratory medicine surgery', 'long-term care', 'long-term care surgery', 'medical biochemistry', 'medical biochemistry surgery', 'microbiology', 'microbiology surgery', 'neonatology', 'neonatology surgery', 'nephrology', 'nephrology surgery', 'neuro-radiology', 'neuro-radiology surgery', 'neurology', 'neurology surgery', 'neuropathology', 'neuropathology surgery', 'neuroradiology', 'neuroradiology surgery', 'neurosurgery', 'nuclear medicine', 'nuclear medicine radiology', 'nuclear medicine radiology surgery', 'nuclear medicine surgery', 'obgyn', 'obgyn surgery', 'obstetrician', 'obstetrician surgery', 'obstetrics', 'obstetrics surgery', 'occupational and environmental medicine', 'occupational and environmental medicine surgery', 'oncology', 'oncology surgery', 'ophthalmology', 'ophthalmology surgery', 'opthalmology', 'opthalmology surgery', 'orthopedic', 'orthopedic surgery', 'orthopedics', 'orthopedics surgery', 'oto-rhino-laryngology', 'oto-rhino-laryngology surgery', 'otolaryngology', 'otolaryngology surgery', 'otoloryngology', 'otoloryngology surgery', 'otorhinolaryngology', 'otorhinolaryngology surgery', 'palliative medicine', 'palliative medicine surgery', 'pathobiology', 'pathobiology surgery', 'pathology', 'pathology surgery', 'pediatric', 'pediatric surgery', 'pediatrician', 'pediatrician surgery', 'pediatrics', 'pediatrics surgery', 'pharmacology', 'pharmacology surgery', 'physiatry', 'physiatry surgery', 'physical medicine and rehabilitation', 'physical medicine and rehabilitation surgery', 'physiology', 'physiology surgery', 'plastic surgery', 'pneumology', 'pneumology surgery', 'primary care mental health', 'primary care mental health surgery', 'psychiatrist', 'psychiatrist surgery', 'psychiatry', 'psychiatry surgery', 'psychology', 'psychology surgery', 'public health', 'public health surgery', 'radiology', 'radiology surgery', 'respiratory disease', 'respiratory disease surgery', 'respirology', 'respirology surgery', 'rheumatology', 'rheumatology surgery', 'rural medicine', 'rural medicine surgery', 'sport and exercise medicine', 'sport and exercise medicine surgery', 'surgery', 'syphilology', 'syphilology surgery', 'thoracic surgery', 'toxicology', 'toxicology surgery', 'urology', 'urology surgery', 'vascular surgery', 'virology', 'virology surgery']
 professionsSet = set([a.lower().strip() for a in professionsSet])
 searchString = ""
 for item in professionsSet:
@@ -86,6 +86,35 @@ class DoctorInfo:
                     'december':12
                     }
   
+  professionReplaceDict = {
+        'epidemiology': 'public health',
+        'obstetrics': 'obgyn',
+        'obstetrician': 'obgyn',
+        'gynecology': 'obgyn',
+        'gynaecology': 'obgyn',
+        'psychiatrist': "psychiatry",
+        'anesthesiology': 'anesthesia',
+        'anesthetist': 'anesthesia',
+        'family practice': 'family medicine',
+        'rural practice': 'family medicine',
+        'rural medicine': 'family medicine',
+        'general practice': 'family medicine',
+        'orthopedic': 'orthopedics',
+        'orthopedic surgery': 'orthopedics',
+        'orthopedics surgery': 'orthopedics',
+        'laboratory medicine': 'pathology',
+        'microbiology': 'pathology',  
+        'virology': 'pathology', 
+        'bacteriology': 'pathology', 
+        'pediatrics': 'pediatric',
+        'pediatrician': 'pediatric',
+        'otolaryngology': 'otolaryngology',
+        'otorhinolaryngology': 'otolaryngology',
+        'otoloryngology': 'otolaryngology',
+        'internist': 'internal medicine',  
+        'pneumology': 'respirology',
+    }
+  
 
   def populateAgeAndDate(self,diedText):
         #month (Here to make sure date is valid)
@@ -114,6 +143,19 @@ class DoctorInfo:
         self.yearOfDeath = year
 
   def populateProfession(self,field):
+      field = field.split()
+      #-ologist -ology merge
+      for i,item in enumerate(field):
+          if item.endswith("ologist"):
+              field[i] = item[0:-3]+"y"
+
+      #-surgeon -surgery merge
+      for i,item in enumerate(field):
+          if item.endswith("surgeon"):
+              field[i] = item[0:-3]+"ery"
+      
+      field = " ".join(field)
+
       #check if profession word here
       professionsList = professionsRegex.findall(field)
       if(len(professionsList)<1):
@@ -136,69 +178,17 @@ class DoctorInfo:
         for item in self.profession:
             professionsList.add(item)
       
-      #-ologist -ology merge
+      #substitutions
+      toAdd = []
       toRemove = []
       for item in professionsList:
-          if item.endswith("ologist"):
-              toRemove.append(item)
+        if item in self.professionReplaceDict:
+            toRemove.append(item)
+            toAdd.append(self.professionReplaceDict[item])
+      for item in toAdd:
+          professionsList.add(item)
       for item in toRemove:
           professionsList.remove(item)
-          professionsList.add(item[0:-3]+"y")
-
-      #-surgeon -surgery merge
-      toRemove = []
-      for item in professionsList:
-          if item.endswith("surgeon"):
-              toRemove.append(item) 
-      for item in toRemove:
-          professionsList.remove(item)
-          professionsList.add(item[0:-3]+"ery")
-      
-      #remove common combos
-      if('obstetrics' in professionsList and 'gynecology' in professionsList):
-          professionsList.remove('obstetrics')
-          professionsList.remove('gynecology')
-          professionsList.add('obgyn')
-      if('obstetrics' in professionsList and 'obgyn' in professionsList):
-          professionsList.remove('obstetrics')
-      if('gynecology' in professionsList and 'obgyn' in professionsList):
-          professionsList.remove('gynecology')
-      if('psychiatrist' in professionsList):
-          professionsList.remove('psychiatrist')
-          professionsList.add("psychiatry")
-      if('anesthesiology' in professionsList):
-          professionsList.remove('anesthesiology')
-          professionsList.add("anesthesia")
-      if('anesthetist' in professionsList):
-          professionsList.remove('anesthetist')
-          professionsList.add("anesthesia")
-      if('family practice' in professionsList):
-          professionsList.remove('family practice')
-          professionsList.add("family medicine")
-      if('rural medicine' in professionsList):
-          professionsList.remove('rural medicine')
-          professionsList.add("family medicine")
-      if('general practice' in professionsList):
-          professionsList.remove('general practice')
-          professionsList.add("family medicine")
-      if('orthopedics' in professionsList and 'orthopedic surgery' in professionsList):
-          professionsList.remove('orthopedics')
-      if("pediatrics" in professionsList):
-          professionsList.remove('pediatrics')
-          professionsList.add("pediatric")
-      if("pediatrician" in professionsList):
-          professionsList.remove('pediatrician')
-          professionsList.add("pediatric")
-      if('laboratory medicine' in professionsList and 'pathology' in professionsList):
-          professionsList.remove('laboratory medicine')
-      
-      #specialties that trumped or are trumped by any others
-      if('family medicine' in professionsList and len(professionsList)>1):
-          professionsList.remove('family medicine')
-      if('pediatric' in professionsList and len(professionsList)>1):
-          professionsList.remove('pediatric')
-      if('internal medicine' in professionsList and len(professionsList)>1):
-          professionsList.remove('internal medicine')
       
       #remove substrings
       toRemove = []
@@ -209,6 +199,18 @@ class DoctorInfo:
       for item in toRemove:
           professionsList.remove(item)
 
+      #specialties that trumped or are trumped by others
+      if('family medicine' in professionsList and len(professionsList)>1):
+          professionsList.remove('family medicine')
+      if('surgery' in professionsList and len(professionsList)>1):
+          professionsList.remove('surgery')
+      if('pediatric' in professionsList and len(professionsList)>1):
+          professionsList.remove('pediatric')
+      if('internal medicine' in professionsList and len(professionsList)>1):
+          professionsList.remove('internal medicine')
+      
+
+      #only accept 1 profession
       sizeOfProfessionsList = len(professionsList)
       if sizeOfProfessionsList == 1:
         self.profession = professionsList
@@ -217,11 +219,11 @@ class DoctorInfo:
         return False 
       
       #keep track of common combos
-    #   key = str(professionsList)
-    #   if key in commonCombos:
-    #     commonCombos[key] += 1
-    #   else:
-    #     commonCombos[key] = 1
+      key = str(professionsList)
+      if key in commonCombos:
+        commonCombos[key] += 1
+      else:
+        commonCombos[key] = 1
       raise Exception("Invalid interestion size"+str(professionsList))
           
       
@@ -277,7 +279,7 @@ def main():
             if(userInput != "y"):
                 print("Operation cancelled, exiting")
                 exit()
-        os.rmdir(outputDir)
+        shutil.rmtree(outputDir)
     os.makedirs(outputDir, exist_ok = False)
 
     #read original csvs
@@ -302,7 +304,7 @@ def main():
     print("Errors", len(errorsArray))
     print("Valid", len(doctorInfoArray))
     # print("Possible professions missed in professionsSet", set(professionsMissed))
-    # print("Possible missed combos", json.dumps({k: v for k, v in sorted(commonCombos.items(), key=lambda item: item[1])},indent=4))
+    print("Possible missed combos", json.dumps({k: v for k, v in sorted(commonCombos.items(), key=lambda item: item[1])},indent=4))
 
     #count statistics
     infoDict = dict()

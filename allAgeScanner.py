@@ -3,12 +3,10 @@ import csv
 import os
 import pandas as pd
 import numpy as np
-import json
 import time
-import datetime
+import shutil
 import traceback
 
-# professionsMissed = []
 # commonCombos = dict()
 
 #Separate out fields
@@ -101,120 +99,6 @@ class DoctorInfo:
         if(self.yearOfDeath != None): raise Exception("Double populating yearOfDeath")
         self.yearOfDeath = year
 
-  def populateProfession(self,field):
-      #check if profession word here
-      professionsList = professionsRegex.findall(field)
-      if(len(professionsList)<1):
-          return False
-      
-      #findall formatting is strange
-      if(isinstance(professionsList[0],tuple)):
-        professionsList = set(["".join(x) for x in professionsList])
-      
-      if("" in professionsList):
-        professionsList.remove("")
-
-    #   #find common profession name pattern to add to our list
-    #   for word in field.split(): 
-    #     if (word.endswith(("ology","ologics","ologist","ics","ist","surgery")) and word not in professionsSet):
-    #         professionsMissed.append(word)
-
-      #add any previously found jobs
-      if(self.profession != None):
-        for item in self.profession:
-            professionsList.add(item)
-      
-      #-ologist -ology merge
-      toRemove = []
-      for item in professionsList:
-          if item.endswith("ologist"):
-              toRemove.append(item)
-      for item in toRemove:
-          professionsList.remove(item)
-          professionsList.add(item[0:-3]+"y")
-
-      #-surgeon -surgery merge
-      toRemove = []
-      for item in professionsList:
-          if item.endswith("surgeon"):
-              toRemove.append(item) 
-      for item in toRemove:
-          professionsList.remove(item)
-          professionsList.add(item[0:-3]+"ery")
-      
-      #remove common combos
-      if('obstetrics' in professionsList and 'gynecology' in professionsList):
-          professionsList.remove('obstetrics')
-          professionsList.remove('gynecology')
-          professionsList.add('obgyn')
-      if('obstetrics' in professionsList and 'obgyn' in professionsList):
-          professionsList.remove('obstetrics')
-      if('gynecology' in professionsList and 'obgyn' in professionsList):
-          professionsList.remove('gynecology')
-      if('psychiatrist' in professionsList):
-          professionsList.remove('psychiatrist')
-          professionsList.add("psychiatry")
-      if('anesthesiology' in professionsList):
-          professionsList.remove('anesthesiology')
-          professionsList.add("anesthesia")
-      if('anesthetist' in professionsList):
-          professionsList.remove('anesthetist')
-          professionsList.add("anesthesia")
-      if('family practice' in professionsList):
-          professionsList.remove('family practice')
-          professionsList.add("family medicine")
-      if('rural medicine' in professionsList):
-          professionsList.remove('rural medicine')
-          professionsList.add("family medicine")
-      if('general practice' in professionsList):
-          professionsList.remove('general practice')
-          professionsList.add("family medicine")
-      if('orthopedics' in professionsList and 'orthopedic surgery' in professionsList):
-          professionsList.remove('orthopedics')
-      if("pediatrics" in professionsList):
-          professionsList.remove('pediatrics')
-          professionsList.add("pediatric")
-      if("pediatrician" in professionsList):
-          professionsList.remove('pediatrician')
-          professionsList.add("pediatric")
-      if('laboratory medicine' in professionsList and 'pathology' in professionsList):
-          professionsList.remove('laboratory medicine')
-      
-      #specialties that trumped or are trumped by any others
-      if('family medicine' in professionsList and len(professionsList)>1):
-          professionsList.remove('family medicine')
-      if('pediatric' in professionsList and len(professionsList)>1):
-          professionsList.remove('pediatric')
-      if('internal medicine' in professionsList and len(professionsList)>1):
-          professionsList.remove('internal medicine')
-      
-      #remove substrings
-      toRemove = []
-      for item1 in professionsList:
-          for item2 in professionsList:
-            if item1!=item2 and re.search(r"(\b" + re.escape(item1) + r"\b)", item2):
-                toRemove.append(item1)
-      for item in toRemove:
-          professionsList.remove(item)
-
-      sizeOfProfessionsList = len(professionsList)
-      if sizeOfProfessionsList == 1:
-        self.profession = professionsList
-        return True
-      elif(sizeOfProfessionsList == 0):
-        return False 
-      
-      #keep track of common combos
-    #   key = str(professionsList)
-    #   if key in commonCombos:
-    #     commonCombos[key] += 1
-    #   else:
-    #     commonCombos[key] = 1
-      raise Exception("Invalid interestion size"+str(professionsList))
-          
-      
-      
-
   def populate(self):
       diedText = None
       
@@ -261,7 +145,7 @@ def main():
             if(userInput != "y"):
                 print("Operation cancelled, exiting")
                 exit()
-        os.rmdir(outputDir)
+        shutil.rmtree(outputDir)
     os.makedirs(outputDir, exist_ok = False)
 
     #read original csvs
@@ -285,9 +169,7 @@ def main():
             
     print("Errors", len(errorsArray))
     print("Valid", len(doctorInfoArray))
-    # print("Possible professions missed in professionsSet", set(professionsMissed))
-    # print("Possible missed combos", json.dumps({k: v for k, v in sorted(commonCombos.items(), key=lambda item: item[1])},indent=4))
-
+  
     #count statistics
     infoDict = dict()
     allYearsKey="allYears"
