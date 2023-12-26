@@ -92,7 +92,7 @@ class DoctorInfo:
         'obstetrician': 'obgyn',
         'gynecology': 'obgyn',
         'gynaecology': 'obgyn',
-        'psychiatrist': "psychiatry",
+        'psychiatrist': 'psychiatry',
         'anesthesiology': 'anesthesia',
         'anesthetist': 'anesthesia',
         'family practice': 'family medicine',
