@@ -12,6 +12,8 @@ import traceback
 # commonCombos = dict()
 checkingProfession = True
 checkingYear = True
+#valid: checkingProfession and checking year, checking year but not profession, not checking year but checking profession
+assert(checkingProfession or checkingYear)
 
 #Separate out fields
 def getFields(text):
@@ -41,11 +43,11 @@ professionsRegex = re.compile(searchString)
 class DoctorInfo:
   def __init__(self, text):
         #initialize
-        if(checkingYear):
-            self.age = None 
+        self.age = None 
         if(checkingProfession):
             self.profession = None
-        self.yearOfDeath = None
+        if(checkingYear):
+            self.yearOfDeath = None
         self.isError = False
 
         #separate out info in array
@@ -239,10 +241,10 @@ class DoctorInfo:
       
       for ind,field in enumerate(self.fields):      
           #age only
-          if(not checkingYear and "aged" in field):
+          if(not checkingYear and "aged" in field.split()):
               field = field.split()
               #age 
-              age = diedText[field.index("aged")+1]
+              age = field[field.index("aged")+1]
               assert(age.isnumeric())
               if(self.age != None): raise Exception("Double populating age")
               self.age = int(age)
@@ -332,15 +334,17 @@ def main():
     numProfessions = 1
     numYears = 1
     for obituary in doctorInfoArray:
-        currYearKey = str(obituary.yearOfDeath)
+        if(checkingYear):
+            currYearKey = str(obituary.yearOfDeath)
+
         if(checkingProfession):
             [currProfessionKey] = obituary.profession
-        if(currYearKey not in infoDict):
+        if(checkingYear and currYearKey not in infoDict):
             numYears +=1
             infoDict[currYearKey] = dict()
             infoDict[currYearKey][totalDeathKey] = []
 
-        if(checkingProfession and currProfessionKey not in infoDict[currYearKey]):
+        if(checkingYear and checkingProfession and currProfessionKey not in infoDict[currYearKey]):
             infoDict[currYearKey][currProfessionKey] = []
             
         if(checkingProfession and currProfessionKey not in infoDict[allYearsKey]):
@@ -349,56 +353,97 @@ def main():
         
         if(checkingProfession):
             infoDict[allYearsKey][currProfessionKey].append(obituary.age)
-            infoDict[currYearKey][currProfessionKey].append(obituary.age)
+            if(checkingYear):
+                infoDict[currYearKey][currProfessionKey].append(obituary.age)
         infoDict[allYearsKey][totalDeathKey].append(obituary.age)
-        infoDict[currYearKey][totalDeathKey].append(obituary.age)
+        if(checkingYear):
+            infoDict[currYearKey][totalDeathKey].append(obituary.age)
         
-    
-    #format data
-    colTitles = ["deaths","avg age","median death","Q3 death","Q1 death","IQR death",""]
-    colsPerProfession = len(colTitles)
-    
-    shape = (numYears+2,numProfessions*colsPerProfession+1)
-    output =np.full(shape, "", dtype="object", order='C')
-
-    #output num errors vs valid
-    output[numYears+1,0] = "Included: "+ str(len(doctorInfoArray))
-    output[numYears+1,1] = "Ommitted due to error: "+ str(len(errorsArray))
-
-    #get index for each profession and add titles
-    #sorted by most deaths
-    professionIndices = dict()
-    for ind,(key,value) in enumerate(sorted(infoDict[allYearsKey].items(), key=lambda item: len(item[1]), reverse=True)):
-        a = 1+ind*colsPerProfession
-        b = a+colsPerProfession
-        output[0,a:b] = [key+" "+title for title in colTitles]
-        professionIndices[key] = ind
-
-    #titles for full array
-    output[0,0] = "year"
-
-    #loop through years in order
-    sortedYears = sorted(infoDict.items(), key=lambda item: int(item[0]) if item[0].isdecimal() else 99999999)
-    for yearInd,(year,yearDict) in enumerate(sortedYears):
-        currRow = yearInd+1
-        output[currRow,0] = str(year)
+    if(checkingYear):
+        #format data
+        colTitles = ["deaths","avg age","median death","Q3 death","Q1 death","IQR death",""]
+        colsPerProfession = len(colTitles)
         
-        for profession,deathsArray in yearDict.items():
-            ind = professionIndices[profession]
-            deaths = len(deathsArray)
-            avg = np.average(deathsArray)
-            median = np.median(deathsArray)
-            Q3, Q1 = np.percentile(deathsArray, [75 ,25])
-            iqr = Q3 - Q1
+        shape = (numYears+2,numProfessions*colsPerProfession+1)
+        output =np.full(shape, "", dtype="object", order='C')
+
+        #output num errors vs valid
+        output[numYears+1,0] = "Included: "+ str(len(doctorInfoArray))
+        output[numYears+1,1] = "Ommitted due to error: "+ str(len(errorsArray))
+
+        #get index for each profession and add titles
+        #sorted by most deaths
+        professionIndices = dict()
+        for ind,(key,value) in enumerate(sorted(infoDict[allYearsKey].items(), key=lambda item: len(item[1]), reverse=True)):
             a = 1+ind*colsPerProfession
             b = a+colsPerProfession
-            output[currRow,a:b] = [
-                deaths,avg,median,Q3,Q1,iqr,""
-            ]
+            output[0,a:b] = [key+" "+title for title in colTitles]
+            professionIndices[key] = ind
 
-        
+        #titles for full array
+        output[0,0] = "year"
+
+        #loop through years in order
+        sortedYears = sorted(infoDict.items(), key=lambda item: int(item[0]) if item[0].isdecimal() else 99999999)
+        for yearInd,(year,yearDict) in enumerate(sortedYears):
+            currRow = yearInd+1
+            output[currRow,0] = str(year)
+            
+            for profession,deathsArray in yearDict.items():
+                ind = professionIndices[profession]
+                deaths = len(deathsArray)
+                avg = np.average(deathsArray)
+                median = np.median(deathsArray)
+                Q3, Q1 = np.percentile(deathsArray, [75 ,25])
+                iqr = Q3 - Q1
+                a = 1+ind*colsPerProfession
+                b = a+colsPerProfession
+                output[currRow,a:b] = [
+                    deaths,avg,median,Q3,Q1,iqr,""
+                ]
+    else: #not checking year
+        allDeathAges = infoDict[allYearsKey][totalDeathKey]
+        colTitles = infoDict[allYearsKey].keys()
+        rowNum = len(allDeathAges)+2
+        colNum = len(colTitles)
+        shape = (rowNum,colNum)
+        output =np.full(shape, "", dtype="object", order='C')
+
+        #output num errors vs valid
+        output[0,0] = "Included: "+ str(len(doctorInfoArray))
+        output[0,1] = "Ommitted due to error: "+ str(len(errorsArray))
+
+        #titles
+        output[1,0:len(colTitles)] = colTitles
+
+        #get index for each profession and add titles
+        #sorted by most deaths
+        professionIndices = dict()
+        for ind,(key,value) in enumerate(sorted(infoDict[allYearsKey].items(), key=lambda item: len(item[1]), reverse=True)):
+            a = ind
+            b = a+1
+            output[0,a:b] = key
+            professionIndices[key] = ind
+
+        #populate array            
+        for profession,deathsArray in infoDict[allYearsKey].items():
+            ind = professionIndices[profession]
+            a = ind
+            b = a+1
+            deathsArray.sort()
+            output[1:len(deathsArray)+1,a:b] = np.transpose([deathsArray])
+
+    if(checkingProfession and checkingYear):
+        filename = "perProfessionPerYear.csv"
+    elif(checkingProfession):
+        filename = "noYear.csv"
+    elif(checkingYear):
+        filename = "noProfession.csv"
+    else: 
+        raise Exception("Invalid mode")
+    
     #save the excel sheet with name of status
-    with open(os.path.join(outputDir,'output.csv'), 'w', newline='', encoding="utf-8-sig") as fp:
+    with open(os.path.join(outputDir,filename), 'w', newline='', encoding="utf-8-sig") as fp:
             writer = csv.writer(fp, quoting=csv.QUOTE_NONNUMERIC)
             writer.writerows(output.tolist())
     
