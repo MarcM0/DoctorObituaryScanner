@@ -11,7 +11,7 @@ import traceback
 # professionsMissed = []
 # commonCombos = dict()
 checkingProfession = True
-checkingYear = True
+checkingYear = False
 #valid: checkingProfession and checking year, checking year but not profession, not checking year but checking profession
 assert(checkingProfession or checkingYear)
 
@@ -123,7 +123,8 @@ class DoctorInfo:
         'pneumology': 'respirology',
         'physiatry': 'physical medicine and rehabilitation',
         'geriatrics': 'geriatric',
-        'geriatrics medicine': 'geriatric'
+        'geriatrics medicine': 'geriatric',
+        'geriatric medicine': 'geriatric'
     }
   
 
@@ -411,16 +412,13 @@ def main():
 
         #output num errors vs valid
         output[0,0] = "Included: "+ str(len(doctorInfoArray))
-        output[0,1] = "Ommitted due to error: "+ str(len(errorsArray))
-
-        #titles
-        output[1,0:len(colTitles)] = colTitles
+        output[1,0] = "Ommitted due to error: "+ str(len(errorsArray))
 
         #get index for each profession and add titles
         #sorted by most deaths
         professionIndices = dict()
         for ind,(key,value) in enumerate(sorted(infoDict[allYearsKey].items(), key=lambda item: len(item[1]), reverse=True)):
-            a = ind
+            a = ind+1
             b = a+1
             output[0,a:b] = key
             professionIndices[key] = ind
@@ -428,7 +426,7 @@ def main():
         #populate array            
         for profession,deathsArray in infoDict[allYearsKey].items():
             ind = professionIndices[profession]
-            a = ind
+            a = ind+1
             b = a+1
             deathsArray.sort()
             output[1:len(deathsArray)+1,a:b] = np.transpose([deathsArray])
