@@ -124,7 +124,9 @@ class DoctorInfo:
         'physiatry': 'physical medicine and rehabilitation',
         'geriatrics': 'geriatric',
         'geriatrics medicine': 'geriatric',
-        'geriatric medicine': 'geriatric'
+        'geriatric medicine': 'geriatric',
+        'neuro-radiology': "radiology",
+        'neuroradiology': "radiology"
     }
   
 
