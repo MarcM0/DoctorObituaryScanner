@@ -15,8 +15,9 @@ python specialtyAgeScanner.py
 ```
 The results will appear in a folder called "Output"
 
-You can also get some extra data needed for the study using
+You can also get some extra data needed for the study using different combinations of values in the first few lines of specialtyAgeScanner.py
 ```
-python allAgeScanner.py
+checkingProfession = True
+checkingYear = True
 ```
 
