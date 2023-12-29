@@ -11,7 +11,7 @@ import traceback
 # professionsMissed = []
 # commonCombos = dict()
 checkingProfession = True
-checkingYear = False
+checkingYear = True
 #valid: checkingProfession and checking year, checking year but not profession, not checking year but checking profession
 assert(checkingProfession or checkingYear)
 
