@@ -10,6 +10,8 @@ import traceback
 
 # professionsMissed = []
 # commonCombos = dict()
+checkingProfession = True
+checkingYear = True
 
 #Separate out fields
 def getFields(text):
@@ -39,8 +41,10 @@ professionsRegex = re.compile(searchString)
 class DoctorInfo:
   def __init__(self, text):
         #initialize
-        self.age = None 
-        self.profession = None
+        if(checkingYear):
+            self.age = None 
+        if(checkingProfession):
+            self.profession = None
         self.yearOfDeath = None
         self.isError = False
 
@@ -116,6 +120,8 @@ class DoctorInfo:
         'internist': 'internal medicine',  
         'pneumology': 'respirology',
         'physiatry': 'physical medicine and rehabilitation',
+        'geriatrics': 'geriatric',
+        'geriatrics medicine': 'geriatric'
     }
   
 
@@ -231,9 +237,21 @@ class DoctorInfo:
   def populate(self):
       diedText = None
       
-      for ind,field in enumerate(self.fields):          
+      for ind,field in enumerate(self.fields):      
+          #age only
+          if(not checkingYear and "aged" in field):
+              field = field.split()
+              #age 
+              age = diedText[field.index("aged")+1]
+              assert(age.isnumeric())
+              if(self.age != None): raise Exception("Double populating age")
+              self.age = int(age)
+              assert(10<self.age<125)
+
+              break
+              
           #date of death spread across fields
-          if(diedText is not None):
+          if(checkingYear and diedText is not None):
               #get full died text
               
               diedText+=field.split()
@@ -246,12 +264,12 @@ class DoctorInfo:
               
           
           #get date of death
-          if(field.startswith("died")):
+          if(checkingYear and field.startswith("died")):
               diedText = field.split()
               continue
           
           #get profession
-          if(self.populateProfession(field)):
+          if(checkingProfession and self.populateProfession(field)):
               continue
 
          
@@ -315,21 +333,23 @@ def main():
     numYears = 1
     for obituary in doctorInfoArray:
         currYearKey = str(obituary.yearOfDeath)
-        [currProfessionKey] = obituary.profession
+        if(checkingProfession):
+            [currProfessionKey] = obituary.profession
         if(currYearKey not in infoDict):
             numYears +=1
             infoDict[currYearKey] = dict()
             infoDict[currYearKey][totalDeathKey] = []
 
-        if(currProfessionKey not in infoDict[currYearKey]):
+        if(checkingProfession and currProfessionKey not in infoDict[currYearKey]):
             infoDict[currYearKey][currProfessionKey] = []
             
-        if(currProfessionKey not in infoDict[allYearsKey]):
+        if(checkingProfession and currProfessionKey not in infoDict[allYearsKey]):
             infoDict[allYearsKey][currProfessionKey] = []
             numProfessions+=1
-            
-        infoDict[allYearsKey][currProfessionKey].append(obituary.age)
-        infoDict[currYearKey][currProfessionKey].append(obituary.age)
+        
+        if(checkingProfession):
+            infoDict[allYearsKey][currProfessionKey].append(obituary.age)
+            infoDict[currYearKey][currProfessionKey].append(obituary.age)
         infoDict[allYearsKey][totalDeathKey].append(obituary.age)
         infoDict[currYearKey][totalDeathKey].append(obituary.age)
         
